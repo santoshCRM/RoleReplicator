@@ -1,4 +1,4 @@
-# Dynamics CRM Chat
+# XrmToolbox Plugin Rolereplicator
 Xrmtoolbox has made Dynamics CRM developer life easy.
 I have created a plugin for Xrmtoolbox user.
 With the help of this plugin:-
