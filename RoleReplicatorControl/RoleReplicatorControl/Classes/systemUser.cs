@@ -1,49 +1,75 @@
-﻿using System;
+﻿using Microsoft.Xrm.Sdk;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.Xrm.Sdk;
 namespace RoleReplicatorControl
 {
     internal class systemUser
     {
-        private bool _select;
+        public bool Select { get; set; }
 
-        public bool Select
+        public Guid SystemUserID { get; set; }
+
+        public string FullName { get; set; }
+
+        public string Domainname { get; set; }
+
+        public string BusinessUnit { get; set; }
+
+
+
+        public List<Team> Teams = new List<Team>();
+
+        public List<SecurityRole> Roles = new List<SecurityRole>();
+
+        public List<Queue> Queues = new List<Queue>();
+
+        internal void AddAssoc(Entity entity)
         {
-            get { return _select; }
-            set { _select = value; }
-        }
-        Guid _systemUserID;
 
-        public Guid SystemUserID
-        {
-            get { return _systemUserID; }
-            set { _systemUserID = value; }
-        }
-        string _fullName;
+            if (entity.HasValue("RoleID"))// && !string.IsNullOrEmpty(entity.GetAttributeValue<string>("RoleID"))
+            //    !string.IsNullOrEmpty(entity.GetAttributeValue<string>("RoleID")))
+            {// entity.Attributes["RoleID"].ToString()))
 
-        public string FullName
-        {
-            get { return _fullName; }
-            set { _fullName = value; }
-        }
-        string _domainname;
+                if (!Roles.Any(rl => rl.RoleId == (Guid)((AliasedValue)entity.Attributes["RoleID"]).Value))
+                {
+                    Roles.Add(
+                        new SecurityRole
+                        {
+                            RoleId = (Guid)((AliasedValue)entity.Attributes["RoleID"]).Value,
+                            Name = ((AliasedValue)entity.Attributes["RoleName"]).Value.ToString()
+                        });
+                }
+            }
+            if (entity.HasValue("QueueID"))
+            {
+                if (!Queues.Any(q => q.QueueId == (Guid)((AliasedValue)entity.Attributes["QueueID"]).Value))
+                {
+                    Queues.Add(
+                       new Queue
+                       {
+                           QueueId = (Guid)((AliasedValue)entity.Attributes["QueueID"]).Value,
+                           Name = ((AliasedValue)entity.Attributes["QueueName"]).Value.ToString()
+                       });
+                }
+            }
 
-        public string Domainname
-        {
-            get { return _domainname; }
-            set { _domainname = value; }
+            if (entity.HasValue("TeamID"))
+            {
+                if (!Teams.Any(tm => tm.TeamId == (Guid)((AliasedValue)entity.Attributes["TeamID"]).Value))
+                {
+                    Teams.Add(
+                       new Team
+                       {
+                           TeamId = (Guid)((AliasedValue)entity.Attributes["TeamID"]).Value,
+                           Name = ((AliasedValue)entity.Attributes["TeamName"]).Value.ToString()
+                       });
+                }
+            }
+            // throw new NotImplementedException();
         }
 
-        private string _businessUnit;
 
-        public string BusinessUnit
-        {
-            get { return _businessUnit; }
-            set { _businessUnit = value; }
-        }
         //private EntityReference _businessUnit;
 
         //public EntityReference BusinessUnit
@@ -53,7 +79,7 @@ namespace RoleReplicatorControl
         //}
 
 
-       
+
 
     }
 }

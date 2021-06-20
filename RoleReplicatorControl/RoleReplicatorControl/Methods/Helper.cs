@@ -1,6 +1,5 @@
 ﻿using Microsoft.Crm.Sdk.Messages;
 using Microsoft.Xrm.Sdk;
-using Microsoft.Xrm.Sdk.Client;
 using Microsoft.Xrm.Sdk.Messages;
 using Microsoft.Xrm.Sdk.Query;
 using System;
@@ -9,7 +8,6 @@ using System.IO;
 using System.Linq;
 using System.ServiceModel.Description;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml;
 namespace RoleReplicatorControl
@@ -74,6 +72,16 @@ namespace RoleReplicatorControl
             _serviceProxy = Service;
 
         }
+
+        public static bool HasValue(this Entity entity, string field)
+        {
+            if (entity.Attributes.Contains(field))
+            {
+                return true;
+            }
+
+            return false;
+        }
         internal static List<systemUser> getUsers()
         {
 
@@ -92,6 +100,7 @@ namespace RoleReplicatorControl
                   <filter type='and'>
                       <condition attribute='isdisabled' operator='eq' value='0' />
                       <condition attribute='accessmode' operator='ne' value='3' />
+                      <condition attribute='accessmode' operator='ne' value='4' />
                   </filter>
               </entity>
             </fetch>";
@@ -119,16 +128,6 @@ namespace RoleReplicatorControl
                                 BusinessUnit = ((EntityReference)ent.Attributes["businessunitid"]).Name,
                                 SystemUserID = ent.Id
                             }));
-                //foreach (Entity ent in returnCollection.Entities)
-                //{
-                //    systemUser user = new systemUser();
-                //    user.Domainname = ent.Attributes["domainname"].ToString();
-                //    user.FullName = ent.Attributes["fullname"].ToString();
-                //    user.BusinessUnit = ((EntityReference)ent.Attributes["businessunitid"]).Name;
-                //    user.SystemUserID = ent.Id;
-                //    SystemUser.Add(user);
-                //    //SystemUsergrid.Add(user);
-                //}
 
                 // Check for morerecords, if it returns 1.
                 if (returnCollection.MoreRecords)
@@ -148,6 +147,97 @@ namespace RoleReplicatorControl
 
             return SystemUser;
         }
+
+        internal static void getUserDetail(List<systemUser> destUsers)
+        {
+            var fetchXml = $@"
+<fetch>
+  <entity name='systemuser'>
+    <attribute name='fullname' />
+    <attribute name='systemuserid' />
+    <filter type='or'>
+      <condition attribute='systemuserid' operator='in'>
+        {string.Join(string.Empty, destUsers.Select(usr => "<value>" + usr.SystemUserID + "</value>" + Environment.NewLine))} 
+      </condition>
+    </filter>
+    <link-entity name='systemuserroles' from='systemuserid' to='systemuserid' link-type='outer'>
+      <link-entity name='role' from='roleid' to='roleid' intersect='true'>
+        <attribute name='name' alias='RoleName'/>
+        <attribute name='roleid' alias='RoleID'/>
+      </link-entity>
+    </link-entity>
+    <link-entity name='teammembership' from='systemuserid' to='systemuserid' link-type='outer'>
+      <link-entity name='team' from='teamid' to='teamid' link-type='outer' intersect='true'>
+        <attribute name='teamid' alias='TeamID'/>
+        <attribute name='name' alias='TeamName' />
+      </link-entity>
+    </link-entity>
+    <link-entity name='queuemembership' from='systemuserid' to='systemuserid'>
+      <link-entity name='queue' from='queueid' to='queueid' intersect='true'>
+        <attribute name='queuetypecode' />
+        <attribute name='queueid' alias='QueueID'/>
+        <attribute name='name' alias='QueueName'/>
+        <attribute name='msdyn_queuetype' />
+        <filter>
+          <condition attribute='queueviewtype' operator='eq' value='1'/>
+          <condition attribute='name' operator='not-like' value='&lt;'/>
+        </filter>
+      </link-entity>
+    </link-entity>
+  </entity>
+</fetch>";
+            int fetchCount = 5000;// Initialize the page number.
+            int pageNumber = 1;// Initialize the number of records.
+            string pagingCookie = null;
+
+            var returnUsers = new List<systemUser>();
+            while (true)
+            {
+                // Build fetchXml string with the placeholders.
+                string xml = CreateXml(fetchXml, pagingCookie, pageNumber, fetchCount);
+
+                // Excute the fetch query and get the xml result.
+                RetrieveMultipleRequest fetchRequest1 = new RetrieveMultipleRequest
+                {
+                    Query = new FetchExpression(xml)
+                };
+
+                EntityCollection returnCollection = ((RetrieveMultipleResponse)ServiceProxy.Execute(fetchRequest1)).EntityCollection;
+
+                foreach (Entity entity in returnCollection.Entities)
+                {
+                    destUsers.First(usr => usr.SystemUserID == entity.Id).AddAssoc(entity);
+                }
+                //returnUsers.AddRange(
+                //    returnCollection.Entities
+                //        .Select(
+                //            ent => new systemUser
+                //            {
+                //                Domainname = ent.Attributes["domainname"].ToString(),
+                //                FullName = ent.Attributes["fullname"].ToString(),
+                //                BusinessUnit = ((EntityReference)ent.Attributes["businessunitid"]).Name,
+                //                SystemUserID = ent.Id
+                //            }));
+
+                // Check for morerecords, if it returns 1.
+                if (returnCollection.MoreRecords)
+                {
+                    // Increment the page number to retrieve the next page.
+                    pageNumber++;
+                    // Set the paging cookie to the paging cookie returned from current results.                            
+                    pagingCookie = returnCollection.PagingCookie;
+                }
+                else
+                {
+                    // If no more records in the result nodes, exit the loop.
+                    break;
+                }
+            }
+
+        }
+
+
+
         internal static string CreateXml(string xml, string cookie, int page, int count)
         {
             StringReader stringReader = new StringReader(xml);
@@ -227,7 +317,7 @@ namespace RoleReplicatorControl
 
                     SecurityRole.Name = ent.Attributes["name"].ToString();
                     SecurityRole.BusinessUnit = (EntityReference)ent.Attributes["businessunitid"];
-                    SecurityRole.RoldId = ent.Id;
+                    SecurityRole.RoleId = ent.Id;
                     accessRoles.Add(SecurityRole);
                 }
 
@@ -336,65 +426,75 @@ namespace RoleReplicatorControl
             return userQueues;
         }
 
-        internal static void copyRole(Guid[] toUserID, string[] BUs, bool role, bool team, bool queue)
+        internal static void removeuserRole(List<systemUser> destUsers)// Guid[] toUserID, string[] BUs)
         {
-
-            if (role)
+            ExecuteMultipleRequest multiReq = new ExecuteMultipleRequest
             {
-                removeuserRole(toUserID, BUs);
-                adduserRole(toUserID);
-            }
-            if (team)
-            {
-                removeuserTeam(toUserID, BUs);
-                adduserTeam(toUserID);
-            }
-            if (queue)
-            {
-                removeuserQueue(toUserID, BUs);
-                adduserQueue(toUserID);
-            }
-        }
-        internal static void removeuserRole(Guid[] toUserID, string[] BUs)
-        {
-            for (int x = 0; x < toUserID.Count(); x++)
-            {
-                Guid userid = toUserID[x];
-                List<SecurityRole> userRoles = getSecurityRole(userid);
-                foreach (SecurityRole role in userRoles)
+                Settings = new ExecuteMultipleSettings
                 {
-                    _serviceProxy.Disassociate(
-                  "systemuser",
-                  userid,
-                  new Relationship("systemuserroles_association"),
-                  new EntityReferenceCollection { new EntityReference("role", role.RoldId) });
+                    ContinueOnError = false,
+                    ReturnResponses = true
+                },
+                Requests = new OrganizationRequestCollection()
+            };
 
+            foreach (var user in destUsers)
+            {
+                if (user.Roles.Any())
+                {
+                    DisassociateRequest de = new DisassociateRequest
+                    {
+                        Target = new EntityReference("systemuser", user.SystemUserID),
+                        Relationship = new Relationship("systemuserroles_association"),
+                        RelatedEntities = new EntityReferenceCollection()
+                    };
+                    foreach (SecurityRole role in user.Roles)
+                    {
+                        de.RelatedEntities.Add(new EntityReference("role", role.RoleId));
+
+                    }
+                    multiReq.Requests.Add(de);
                 }
-
-
+            }
+            if (multiReq.Requests.Any())
+            {
+                ExecuteMultipleResponse response = (ExecuteMultipleResponse)ServiceProxy.Execute(multiReq);
             }
         }
-        private static void adduserRole(Guid[] toUserID)
+        internal static void adduserRole(List<systemUser> destUsers, List<SecurityRole> roles)
         {
             try
             {
-                foreach (SecurityRole role in Helper.SecurityRoles)
+                ExecuteMultipleRequest multiReq = new ExecuteMultipleRequest
                 {
-                    if (role.RoldId != Guid.Empty)
+                    Settings = new ExecuteMultipleSettings
                     {
-                        foreach (Guid userid in toUserID)
-                        {
-                            _serviceProxy.Associate(
-                          "systemuser",
-                          userid,
-                          new Relationship("systemuserroles_association"),
-                          new EntityReferenceCollection { new EntityReference("role", role.RoldId) });
+                        ContinueOnError = false,
+                        ReturnResponses = true
+                    },
+                    // Create an empty organization request collection.
+                    Requests = new OrganizationRequestCollection()
+                };
 
-                        }
-
-
+                foreach (var user in destUsers)
+                {
+                    AssociateRequest ar = new AssociateRequest
+                    {
+                        Target = new EntityReference("systemuser", user.SystemUserID),
+                        Relationship = new Relationship("systemuserroles_association"),
+                        RelatedEntities = new EntityReferenceCollection()
+                    };
+                    foreach (SecurityRole role in roles)
+                    {
+                        ar.RelatedEntities.Add(new EntityReference("role", role.RoleId));
                     }
+                    multiReq.Requests.Add(ar);
 
+                }
+
+                if (multiReq.Requests.Any())
+                {
+                    ExecuteMultipleResponse response = (ExecuteMultipleResponse)ServiceProxy.Execute(multiReq);
                 }
             }
             catch (Exception ex)
@@ -405,6 +505,161 @@ namespace RoleReplicatorControl
 
         }
 
+        internal static void adduserTeam(List<systemUser> destUsers, List<Team> teams)
+        {
+            try
+            {
+                ExecuteMultipleRequest multiReq = new ExecuteMultipleRequest
+                {
+                    Settings = new ExecuteMultipleSettings
+                    {
+                        ContinueOnError = false,
+                        ReturnResponses = true
+                    },
+                    // Create an empty organization request collection.
+                    Requests = new OrganizationRequestCollection()
+                };
+
+                foreach (var user in destUsers)
+                {
+                    AssociateRequest ar = new AssociateRequest
+                    {
+                        Target = new EntityReference("systemuser", user.SystemUserID),
+                        Relationship = new Relationship("teammembership_association"),
+                        RelatedEntities = new EntityReferenceCollection()
+                    };
+                    foreach (Team team in teams)
+                    {
+                        ar.RelatedEntities.Add(new EntityReference("team", team.TeamId));
+                    }
+                    multiReq.Requests.Add(ar);
+
+                }
+
+                if (multiReq.Requests.Any())
+                {
+                    ExecuteMultipleResponse response = (ExecuteMultipleResponse)ServiceProxy.Execute(multiReq);
+                }
+            }
+            catch (Exception ex)
+            {
+
+                MessageBox.Show(ex.Message.ToString());
+            }
+        }
+        internal static void removeuserTeam(List<systemUser> destUsers)
+        {
+            ExecuteMultipleRequest multiReq = new ExecuteMultipleRequest
+            {
+                Settings = new ExecuteMultipleSettings
+                {
+                    ContinueOnError = false,
+                    ReturnResponses = true
+                },
+                Requests = new OrganizationRequestCollection()
+            };
+
+            foreach (var user in destUsers)
+            {
+                if (user.Teams.Any())
+                {
+                    DisassociateRequest de = new DisassociateRequest
+                    {
+                        Target = new EntityReference("systemuser", user.SystemUserID),
+                        Relationship = new Relationship("teammembership_association"),
+                        RelatedEntities = new EntityReferenceCollection()
+                    };
+                    foreach (Team team in user.Teams)
+                    {
+                        de.RelatedEntities.Add(new EntityReference("team", team.TeamId));
+
+                    }
+                    multiReq.Requests.Add(de);
+                }
+            }
+            if (multiReq.Requests.Any())
+            {
+                ExecuteMultipleResponse response = (ExecuteMultipleResponse)ServiceProxy.Execute(multiReq);
+            }
+        }
+        internal static void adduserQueue(List<systemUser> destUsers, List<Queue> queues)
+        {
+            try
+            {
+                ExecuteMultipleRequest multiReq = new ExecuteMultipleRequest
+                {
+                    Settings = new ExecuteMultipleSettings
+                    {
+                        ContinueOnError = false,
+                        ReturnResponses = true
+                    },
+                    // Create an empty organization request collection.
+                    Requests = new OrganizationRequestCollection()
+                };
+
+                foreach (var user in destUsers)
+                {
+                    AssociateRequest ar = new AssociateRequest
+                    {
+                        Target = new EntityReference("systemuser", user.SystemUserID),
+                        Relationship = new Relationship("queuemembership_association"),
+                        RelatedEntities = new EntityReferenceCollection()
+                    };
+                    foreach (Queue queue in queues)
+                    {
+                        ar.RelatedEntities.Add(new EntityReference("team", queue.QueueId));
+                    }
+                    multiReq.Requests.Add(ar);
+
+                }
+
+                if (multiReq.Requests.Any())
+                {
+                    ExecuteMultipleResponse response = (ExecuteMultipleResponse)ServiceProxy.Execute(multiReq);
+                }
+            }
+            catch (Exception ex)
+            {
+
+                MessageBox.Show(ex.Message.ToString());
+            }
+        }
+
+        internal static void removeuserQueue(List<systemUser> destUsers)
+        {
+            ExecuteMultipleRequest multiReq = new ExecuteMultipleRequest
+            {
+                Settings = new ExecuteMultipleSettings
+                {
+                    ContinueOnError = false,
+                    ReturnResponses = true
+                },
+                Requests = new OrganizationRequestCollection()
+            };
+
+            foreach (var user in destUsers)
+            {
+                if (user.Teams.Any())
+                {
+                    DisassociateRequest de = new DisassociateRequest
+                    {
+                        Target = new EntityReference("systemuser", user.SystemUserID),
+                        Relationship = new Relationship("queuemembership_association"),
+                        RelatedEntities = new EntityReferenceCollection()
+                    };
+                    foreach (Queue queue in user.Queues)
+                    {
+                        de.RelatedEntities.Add(new EntityReference("queue", queue.QueueId));
+
+                    }
+                    multiReq.Requests.Add(de);
+                }
+            }
+            if (multiReq.Requests.Any())
+            {
+                ExecuteMultipleResponse response = (ExecuteMultipleResponse)ServiceProxy.Execute(multiReq);
+            }
+        }
         internal static void removeuserTeam(Guid[] toUserID, string[] BUs)
         {
             for (int x = 0; x < toUserID.Count(); x++)
@@ -489,5 +744,6 @@ namespace RoleReplicatorControl
             }
 
         }
+
     }
 }

@@ -1,15 +1,14 @@
 ﻿using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("RoleReplicatorControl")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("Copy user roles, teams and queues to multiple users")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("RoleReplicatorControl")]
+[assembly: AssemblyCompany("SantoshCRM LinkeD365")]
+[assembly: AssemblyProduct("RoleReplicator")]
 [assembly: AssemblyCopyright("Copyright ©  2021")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

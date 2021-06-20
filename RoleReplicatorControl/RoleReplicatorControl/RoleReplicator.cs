@@ -1,24 +1,27 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
-using System.Drawing;
 using System.Linq;
-using System.ServiceModel.Description;
-using System.Text;
-using System.Threading.Tasks;
+using System.Reflection;
 using System.Windows.Forms;
 using XrmToolBox.Extensibility;
 using XrmToolBox.Extensibility.Interfaces;
+
 namespace RoleReplicatorControl
 {
-    public partial class RoleReplicator : PluginControlBase
+    public partial class RoleReplicator : PluginControlBase, IGitHubPlugin
     {
+        public string RepositoryName => "RoleReplicator";
+        private AppInsights ai;
+        private const string aiEndpoint = "https://dc.services.visualstudio.com/v2/track";
+
+        private const string aiKey = "f521c450-81df-45cb-aedc-700df1b55541";
+        public string UserName => "santoshCRM";
+
         public RoleReplicator()
         {
             InitializeComponent();
-
-
+            ai = new AppInsights(aiEndpoint, aiKey, Assembly.GetExecutingAssembly());
+            ai.WriteEvent("Control Loaded");
         }
 
 
@@ -36,79 +39,14 @@ namespace RoleReplicatorControl
             }
 
             ExecuteMethod(GetUserDetail);
-            //bool flag = this.drp_users.SelectedIndex > 0;
-            //if (flag)
-            //{
-            //    systemUser user = (systemUser)drp_users.SelectedItem;
-            //    List<SecurityRole> userRoles = Helper.getSecurityRole(user.SystemUserID);
-            //    Helper.SecurityRoles = userRoles;
-            //    lstview_sRole.DataSource = Helper.SecurityRoles;
-            //    lstview_sRole.DisplayMember = "Name";
-            //    lstview_sRole.ValueMember = "RoldId";
-
-            //    List<Team> userTeams = Helper.getTeambyUser(user.SystemUserID, user.BusinessUnit);
-            //    Helper.Teams = userTeams;
-            //    lstbox_Teams.DataSource = Helper.Teams;
-            //    lstbox_Teams.DisplayMember = "Name";
-            //    lstbox_Teams.ValueMember = "TeamId";
-
-            //    List<Queue> userQueues = Helper.getQueuebyUser(user.SystemUserID, user.BusinessUnit);
-            //    Helper.Queues = userQueues;
-            //    lstbox_queues.DataSource = Helper.Queues;
-            //    lstbox_queues.DisplayMember = "Name";
-            //    lstbox_queues.ValueMember = "QueueId";
-
-            //    List<systemUser> _user = DestinationUsers.Where(u => u.Select == true).ToList();
-            //    foreach (systemUser row in _user)
-            //    {
-            //        row.Select = false;
-            //    }
-            //    lbl_bu.Text = user.BusinessUnit;
-            //    grdview_user.DataSource = DestinationUsers.Where(x => x.BusinessUnit == user.BusinessUnit).ToList();
 
         }
 
 
+
         private void btn_copyRole_Click(object sender, EventArgs e)
         {
-            WorkAsync(new WorkAsyncInfo
-            {
-                Message = "Executing request...",
-                Work = (bw, m) =>
-                {
-                    if (Service != null)
-                    {
-                        Guid[] selecteUsers = new Guid[DestinationUsers.Where(u => u.Select == true).Count()];
-                        string[] selecteUserBU = new string[DestinationUsers.Where(u => u.Select == true).Count()];
-                        int x = 0;
-                        foreach (systemUser row in DestinationUsers.Where(u => u.Select == true))
-                        {
-                            selecteUsers[x] = row.SystemUserID;
-                            selecteUserBU[x] = row.BusinessUnit;
-                            x++;
-                        }
-                        if (selecteUsers.Count() > 0)
-                        {
-                            Helper.copyRole(selecteUsers, selecteUserBU, chk_role.Checked, chk_team.Checked, chk_queue.Checked);
-                        }
-                    }
-                },
-                PostWorkCallBack = m =>
-                {
-                    if (m.Error == null)
-                    {
-
-                    }
-                    else
-                    {
-                        MessageBox.Show(this, "An error occured: " + m.Error.Message, "Error", MessageBoxButtons.OK,
-                                        MessageBoxIcon.Error);
-                    }
-                }
-            });
-
-
-
+            ExecuteMethod(CopyRole);
         }
 
         private void txt_filter_TextChanged(object sender, EventArgs e)

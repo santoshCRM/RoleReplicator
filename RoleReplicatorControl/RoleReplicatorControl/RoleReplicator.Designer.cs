@@ -28,6 +28,8 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
             this.lstbox_queues = new System.Windows.Forms.ListBox();
             this.chk_queue = new System.Windows.Forms.CheckBox();
@@ -48,24 +50,32 @@
             this.txt_filter = new System.Windows.Forms.TextBox();
             this.lb_Filter = new System.Windows.Forms.Label();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.splitRightDestUsers = new System.Windows.Forms.SplitContainer();
+            this.splitRightFilter = new System.Windows.Forms.SplitContainer();
             this.drp_users = new System.Windows.Forms.ComboBox();
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.lbl_bu = new System.Windows.Forms.Label();
             this.splitMain = new System.Windows.Forms.SplitContainer();
             this.SplitLeftTop = new System.Windows.Forms.SplitContainer();
+            this.splitUser = new System.Windows.Forms.SplitContainer();
             this.splitLeftRole = new System.Windows.Forms.SplitContainer();
             this.splitLeftTeams = new System.Windows.Forms.SplitContainer();
             this.splitRight = new System.Windows.Forms.SplitContainer();
-            this.splitUser = new System.Windows.Forms.SplitContainer();
-            this.splitRightDestUsers = new System.Windows.Forms.SplitContainer();
-            this.splitRightFilter = new System.Windows.Forms.SplitContainer();
             this.groupBox4.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.grdview_user)).BeginInit();
             this.toolStrip1.SuspendLayout();
             this.groupBox3.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.splitRightDestUsers)).BeginInit();
+            this.splitRightDestUsers.Panel1.SuspendLayout();
+            this.splitRightDestUsers.Panel2.SuspendLayout();
+            this.splitRightDestUsers.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.splitRightFilter)).BeginInit();
+            this.splitRightFilter.Panel1.SuspendLayout();
+            this.splitRightFilter.Panel2.SuspendLayout();
+            this.splitRightFilter.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitMain)).BeginInit();
             this.splitMain.Panel1.SuspendLayout();
             this.splitMain.Panel2.SuspendLayout();
@@ -74,6 +84,10 @@
             this.SplitLeftTop.Panel1.SuspendLayout();
             this.SplitLeftTop.Panel2.SuspendLayout();
             this.SplitLeftTop.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.splitUser)).BeginInit();
+            this.splitUser.Panel1.SuspendLayout();
+            this.splitUser.Panel2.SuspendLayout();
+            this.splitUser.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitLeftRole)).BeginInit();
             this.splitLeftRole.Panel1.SuspendLayout();
             this.splitLeftRole.Panel2.SuspendLayout();
@@ -86,18 +100,6 @@
             this.splitRight.Panel1.SuspendLayout();
             this.splitRight.Panel2.SuspendLayout();
             this.splitRight.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.splitUser)).BeginInit();
-            this.splitUser.Panel1.SuspendLayout();
-            this.splitUser.Panel2.SuspendLayout();
-            this.splitUser.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.splitRightDestUsers)).BeginInit();
-            this.splitRightDestUsers.Panel1.SuspendLayout();
-            this.splitRightDestUsers.Panel2.SuspendLayout();
-            this.splitRightDestUsers.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.splitRightFilter)).BeginInit();
-            this.splitRightFilter.Panel1.SuspendLayout();
-            this.splitRightFilter.Panel2.SuspendLayout();
-            this.splitRightFilter.SuspendLayout();
             this.SuspendLayout();
             // 
             // groupBox4
@@ -117,6 +119,7 @@
             this.lstbox_queues.FormattingEnabled = true;
             this.lstbox_queues.Location = new System.Drawing.Point(3, 16);
             this.lstbox_queues.Name = "lstbox_queues";
+            this.lstbox_queues.SelectionMode = System.Windows.Forms.SelectionMode.None;
             this.lstbox_queues.Size = new System.Drawing.Size(293, 194);
             this.lstbox_queues.TabIndex = 0;
             // 
@@ -160,6 +163,7 @@
             this.lstview_sRole.FormattingEnabled = true;
             this.lstview_sRole.Location = new System.Drawing.Point(3, 16);
             this.lstview_sRole.Name = "lstview_sRole";
+            this.lstview_sRole.SelectionMode = System.Windows.Forms.SelectionMode.None;
             this.lstview_sRole.Size = new System.Drawing.Size(293, 180);
             this.lstview_sRole.TabIndex = 1;
             // 
@@ -168,7 +172,23 @@
             this.grdview_user.AllowUserToAddRows = false;
             this.grdview_user.AllowUserToDeleteRows = false;
             this.grdview_user.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
+            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.grdview_user.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
             this.grdview_user.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.ControlText;
+            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.grdview_user.DefaultCellStyle = dataGridViewCellStyle2;
             this.grdview_user.Dock = System.Windows.Forms.DockStyle.Fill;
             this.grdview_user.Location = new System.Drawing.Point(0, 0);
             this.grdview_user.Name = "grdview_user";
@@ -180,9 +200,10 @@
             // 
             // btn_copyRole
             // 
+            this.btn_copyRole.Image = global::RoleReplicatorControl.Properties.Resources.copy;
             this.btn_copyRole.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.btn_copyRole.Name = "btn_copyRole";
-            this.btn_copyRole.Size = new System.Drawing.Size(63, 22);
+            this.btn_copyRole.Size = new System.Drawing.Size(79, 22);
             this.btn_copyRole.Text = "Run Copy";
             this.btn_copyRole.Click += new System.EventHandler(this.btn_copyRole_Click);
             // 
@@ -193,9 +214,10 @@
             // 
             // btn_retUsers
             // 
+            this.btn_retUsers.Image = global::RoleReplicatorControl.Properties.Resources.Dataverse_32x32;
             this.btn_retUsers.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.btn_retUsers.Name = "btn_retUsers";
-            this.btn_retUsers.Size = new System.Drawing.Size(84, 22);
+            this.btn_retUsers.Size = new System.Drawing.Size(100, 22);
             this.btn_retUsers.Text = "Retrieve Users";
             this.btn_retUsers.Click += new System.EventHandler(this.btn_retUsers_Click);
             // 
@@ -249,6 +271,7 @@
             this.lstbox_Teams.FormattingEnabled = true;
             this.lstbox_Teams.Location = new System.Drawing.Point(3, 16);
             this.lstbox_Teams.Name = "lstbox_Teams";
+            this.lstbox_Teams.SelectionMode = System.Windows.Forms.SelectionMode.None;
             this.lstbox_Teams.Size = new System.Drawing.Size(293, 151);
             this.lstbox_Teams.TabIndex = 8;
             // 
@@ -295,6 +318,43 @@
             this.groupBox1.TabIndex = 0;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Destination Users";
+            // 
+            // splitRightDestUsers
+            // 
+            this.splitRightDestUsers.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.splitRightDestUsers.FixedPanel = System.Windows.Forms.FixedPanel.Panel1;
+            this.splitRightDestUsers.Location = new System.Drawing.Point(3, 16);
+            this.splitRightDestUsers.Name = "splitRightDestUsers";
+            this.splitRightDestUsers.Orientation = System.Windows.Forms.Orientation.Horizontal;
+            // 
+            // splitRightDestUsers.Panel1
+            // 
+            this.splitRightDestUsers.Panel1.Controls.Add(this.splitRightFilter);
+            // 
+            // splitRightDestUsers.Panel2
+            // 
+            this.splitRightDestUsers.Panel2.Controls.Add(this.grdview_user);
+            this.splitRightDestUsers.Size = new System.Drawing.Size(759, 565);
+            this.splitRightDestUsers.SplitterDistance = 25;
+            this.splitRightDestUsers.TabIndex = 3;
+            // 
+            // splitRightFilter
+            // 
+            this.splitRightFilter.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.splitRightFilter.FixedPanel = System.Windows.Forms.FixedPanel.Panel1;
+            this.splitRightFilter.Location = new System.Drawing.Point(0, 0);
+            this.splitRightFilter.Name = "splitRightFilter";
+            // 
+            // splitRightFilter.Panel1
+            // 
+            this.splitRightFilter.Panel1.Controls.Add(this.lb_Filter);
+            // 
+            // splitRightFilter.Panel2
+            // 
+            this.splitRightFilter.Panel2.Controls.Add(this.txt_filter);
+            this.splitRightFilter.Size = new System.Drawing.Size(759, 25);
+            this.splitRightFilter.SplitterDistance = 38;
+            this.splitRightFilter.TabIndex = 0;
             // 
             // drp_users
             // 
@@ -373,6 +433,25 @@
             this.SplitLeftTop.SplitterDistance = 25;
             this.SplitLeftTop.TabIndex = 0;
             // 
+            // splitUser
+            // 
+            this.splitUser.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.splitUser.FixedPanel = System.Windows.Forms.FixedPanel.Panel1;
+            this.splitUser.IsSplitterFixed = true;
+            this.splitUser.Location = new System.Drawing.Point(0, 0);
+            this.splitUser.Name = "splitUser";
+            // 
+            // splitUser.Panel1
+            // 
+            this.splitUser.Panel1.Controls.Add(this.label1);
+            // 
+            // splitUser.Panel2
+            // 
+            this.splitUser.Panel2.Controls.Add(this.drp_users);
+            this.splitUser.Size = new System.Drawing.Size(299, 25);
+            this.splitUser.SplitterDistance = 35;
+            this.splitUser.TabIndex = 3;
+            // 
             // splitLeftRole
             // 
             this.splitLeftRole.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -431,62 +510,6 @@
             this.splitRight.SplitterDistance = 31;
             this.splitRight.TabIndex = 1;
             // 
-            // splitUser
-            // 
-            this.splitUser.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.splitUser.FixedPanel = System.Windows.Forms.FixedPanel.Panel1;
-            this.splitUser.IsSplitterFixed = true;
-            this.splitUser.Location = new System.Drawing.Point(0, 0);
-            this.splitUser.Name = "splitUser";
-            // 
-            // splitUser.Panel1
-            // 
-            this.splitUser.Panel1.Controls.Add(this.label1);
-            // 
-            // splitUser.Panel2
-            // 
-            this.splitUser.Panel2.Controls.Add(this.drp_users);
-            this.splitUser.Size = new System.Drawing.Size(299, 25);
-            this.splitUser.SplitterDistance = 35;
-            this.splitUser.TabIndex = 3;
-            // 
-            // splitRightDestUsers
-            // 
-            this.splitRightDestUsers.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.splitRightDestUsers.FixedPanel = System.Windows.Forms.FixedPanel.Panel1;
-            this.splitRightDestUsers.Location = new System.Drawing.Point(3, 16);
-            this.splitRightDestUsers.Name = "splitRightDestUsers";
-            this.splitRightDestUsers.Orientation = System.Windows.Forms.Orientation.Horizontal;
-            // 
-            // splitRightDestUsers.Panel1
-            // 
-            this.splitRightDestUsers.Panel1.Controls.Add(this.splitRightFilter);
-            // 
-            // splitRightDestUsers.Panel2
-            // 
-            this.splitRightDestUsers.Panel2.Controls.Add(this.grdview_user);
-            this.splitRightDestUsers.Size = new System.Drawing.Size(759, 565);
-            this.splitRightDestUsers.SplitterDistance = 25;
-            this.splitRightDestUsers.TabIndex = 3;
-            // 
-            // splitRightFilter
-            // 
-            this.splitRightFilter.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.splitRightFilter.FixedPanel = System.Windows.Forms.FixedPanel.Panel1;
-            this.splitRightFilter.Location = new System.Drawing.Point(0, 0);
-            this.splitRightFilter.Name = "splitRightFilter";
-            // 
-            // splitRightFilter.Panel1
-            // 
-            this.splitRightFilter.Panel1.Controls.Add(this.lb_Filter);
-            // 
-            // splitRightFilter.Panel2
-            // 
-            this.splitRightFilter.Panel2.Controls.Add(this.txt_filter);
-            this.splitRightFilter.Size = new System.Drawing.Size(759, 25);
-            this.splitRightFilter.SplitterDistance = 38;
-            this.splitRightFilter.TabIndex = 0;
-            // 
             // RoleReplicator
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -505,6 +528,16 @@
             this.groupBox3.ResumeLayout(false);
             this.groupBox2.ResumeLayout(false);
             this.groupBox1.ResumeLayout(false);
+            this.splitRightDestUsers.Panel1.ResumeLayout(false);
+            this.splitRightDestUsers.Panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.splitRightDestUsers)).EndInit();
+            this.splitRightDestUsers.ResumeLayout(false);
+            this.splitRightFilter.Panel1.ResumeLayout(false);
+            this.splitRightFilter.Panel1.PerformLayout();
+            this.splitRightFilter.Panel2.ResumeLayout(false);
+            this.splitRightFilter.Panel2.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.splitRightFilter)).EndInit();
+            this.splitRightFilter.ResumeLayout(false);
             this.splitMain.Panel1.ResumeLayout(false);
             this.splitMain.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitMain)).EndInit();
@@ -513,6 +546,11 @@
             this.SplitLeftTop.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.SplitLeftTop)).EndInit();
             this.SplitLeftTop.ResumeLayout(false);
+            this.splitUser.Panel1.ResumeLayout(false);
+            this.splitUser.Panel1.PerformLayout();
+            this.splitUser.Panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.splitUser)).EndInit();
+            this.splitUser.ResumeLayout(false);
             this.splitLeftRole.Panel1.ResumeLayout(false);
             this.splitLeftRole.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitLeftRole)).EndInit();
@@ -526,21 +564,6 @@
             this.splitRight.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitRight)).EndInit();
             this.splitRight.ResumeLayout(false);
-            this.splitUser.Panel1.ResumeLayout(false);
-            this.splitUser.Panel1.PerformLayout();
-            this.splitUser.Panel2.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.splitUser)).EndInit();
-            this.splitUser.ResumeLayout(false);
-            this.splitRightDestUsers.Panel1.ResumeLayout(false);
-            this.splitRightDestUsers.Panel2.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.splitRightDestUsers)).EndInit();
-            this.splitRightDestUsers.ResumeLayout(false);
-            this.splitRightFilter.Panel1.ResumeLayout(false);
-            this.splitRightFilter.Panel1.PerformLayout();
-            this.splitRightFilter.Panel2.ResumeLayout(false);
-            this.splitRightFilter.Panel2.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.splitRightFilter)).EndInit();
-            this.splitRightFilter.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
