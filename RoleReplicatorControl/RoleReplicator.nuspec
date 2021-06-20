@@ -20,6 +20,6 @@
     </dependencies>
   </metadata>
   <files>
-    <file src="RoleReplicatorControl\bin\Release\Plugins\Savants.RoleReplicatorControl.dll" target="lib\net472\Plugins" />
+    <file src="\bin\Release\Plugins\Savants.RoleReplicatorControl.dll" target="lib\net472\Plugins" />
   </files>
 </package>
