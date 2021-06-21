@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xrm.Sdk;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 namespace RoleReplicatorControl
 {
@@ -8,13 +9,17 @@ namespace RoleReplicatorControl
     {
         public bool Select { get; set; }
 
-        public Guid SystemUserID { get; set; }
 
+        [DisplayName("User Name")]
         public string FullName { get; set; }
 
-        public string Domainname { get; set; }
+        [DisplayName("Email")]
 
+        public string Domainname { get; set; }
+        [DisplayName("Business Unit")]
         public string BusinessUnit { get; set; }
+        [DisplayName("ID")]
+        public Guid SystemUserID { get; set; }
 
 
 
@@ -27,9 +32,8 @@ namespace RoleReplicatorControl
         internal void AddAssoc(Entity entity)
         {
 
-            if (entity.HasValue("RoleID"))// && !string.IsNullOrEmpty(entity.GetAttributeValue<string>("RoleID"))
-            //    !string.IsNullOrEmpty(entity.GetAttributeValue<string>("RoleID")))
-            {// entity.Attributes["RoleID"].ToString()))
+            if (entity.HasValue("RoleID"))
+            { 
 
                 if (!Roles.Any(rl => rl.RoleId == (Guid)((AliasedValue)entity.Attributes["RoleID"]).Value))
                 {
@@ -66,20 +70,6 @@ namespace RoleReplicatorControl
                        });
                 }
             }
-            // throw new NotImplementedException();
         }
-
-
-        //private EntityReference _businessUnit;
-
-        //public EntityReference BusinessUnit
-        //{
-        //    get { return _businessUnit; }
-        //    set { _businessUnit = value; }
-        //}
-
-
-
-
     }
 }

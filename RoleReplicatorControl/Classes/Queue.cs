@@ -4,21 +4,10 @@ namespace RoleReplicatorControl
 {
     public class Queue
     {
-        Guid _queueId;
 
-        public Guid QueueId
-        {
-            get => _queueId;
-            set => _queueId = value;
-        }
+        public Guid QueueId { get; set; }
 
-        string _name;
-
-        public string Name
-        {
-            get => _name;
-            set => _name = value;
-        }
+        public string Name { get; set; }
 
     }
 }

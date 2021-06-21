@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Reflection;
@@ -35,14 +36,17 @@ namespace RoleReplicatorControl
         {
             if (drp_users.SelectedIndex == 0)
             {
+                lstview_sRole.DataSource = new List<systemUser>();
+                lstbox_queues.DataSource = new List<Queue>();
+                lstbox_Teams.DataSource = new List<Team>();
+
+            
                 return;
             }
 
             ExecuteMethod(GetUserDetail);
 
         }
-
-
 
         private void btn_copyRole_Click(object sender, EventArgs e)
         {
@@ -73,14 +77,14 @@ namespace RoleReplicatorControl
                     if ((bool)row.Cells[0].Value == false)
                     {
                         row.Cells[0].Value = true;
-                        systemUser user = DestinationUsers.Where(x => x.SystemUserID.Equals(row.Cells[1].Value)).First();
+                        systemUser user = DestinationUsers.Where(x => x.SystemUserID.Equals((row.DataBoundItem as systemUser).SystemUserID)).First();
                         user.Select = true;
 
                     }
                     else
                     {
                         row.Cells[0].Value = !(bool)row.Cells[0].Value;
-                        systemUser user = DestinationUsers.Where(x => x.SystemUserID.Equals(row.Cells[1].Value)).First();
+                        systemUser user = DestinationUsers.Where(x => x.SystemUserID.Equals((row.DataBoundItem as systemUser).SystemUserID)).First();
                         user.Select = false;
                     }
                 }

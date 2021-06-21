@@ -4,13 +4,17 @@
     <id>RoleReplicator</id>
     <title>Role Replicator</title>
     <version>$version$</version>
-    <authors>Savants LinkeD365</authors>
-    <owners>Savants</owners>
+    <authors>Savants &amp; LinkeD365</authors>
+    <owners>Savants &amp; LinkeD365</owners>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <projectUrl>https://github.com/santoshCRM/RoleReplicator</projectUrl>
     <iconUrl>https://avatars3.githubusercontent.com/u/23490088?v=3&amp;u=5e1077f5d78f133a42cf1748abdc9b8c51b3a994&amp;s=400</iconUrl>
     <description>A XrmToolBox tool to copy a users roles, teams or queues to multiple users</description>
     <releaseNotes>
+      #6 Fixed issue where you could assign to same user
+      #5 altered order/labels of columns
+      Cleared roles/queues/teams when "Select User" selected
+      
       Re-make with new version of XrmToolBox
     </releaseNotes>
     <copyright>Copyright 2021</copyright>

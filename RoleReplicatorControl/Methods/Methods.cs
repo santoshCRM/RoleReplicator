@@ -97,7 +97,15 @@ namespace RoleReplicatorControl
 
         void CopyRole()
         {
-            List<systemUser> destUsers = DestinationUsers.Where(usr => usr.Select).ToList();
+            if (drp_users.SelectedItem == null || drp_users.SelectedIndex == 0)
+            {
+                MessageBox.Show(
+                    "Please select a source user before initiating the copy",
+                    "Select Users to Copy From",
+                    MessageBoxButtons.OK);
+                return;
+            }
+            List<systemUser> destUsers = DestinationUsers.Where(usr => usr.Select && usr.SystemUserID != ((systemUser) drp_users.SelectedItem).SystemUserID).ToList();
             if (!destUsers.Any())
             {
                 MessageBox.Show(
