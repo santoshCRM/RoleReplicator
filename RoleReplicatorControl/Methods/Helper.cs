@@ -177,7 +177,7 @@ namespace RoleReplicatorControl
         <attribute name='queuetypecode' />
         <attribute name='queueid' alias='QueueID'/>
         <attribute name='name' alias='QueueName'/>
-        <attribute name='msdyn_queuetype' />
+       
         <filter>
           <condition attribute='queueviewtype' operator='eq' value='1'/>
           <condition attribute='name' operator='not-like' value='&lt;'/>
