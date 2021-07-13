@@ -11,6 +11,13 @@
     <iconUrl>https://avatars3.githubusercontent.com/u/23490088?v=3&amp;u=5e1077f5d78f133a42cf1748abdc9b8c51b3a994&amp;s=400</iconUrl>
     <description>A XrmToolBox tool to copy a users roles, teams or queues to multiple users</description>
     <releaseNotes>
+      #11 Impvroved searching on main grid
+      #10 Fixed issue as it tried to remove the default BU Team
+      #9 Added BU toggle to change BU as well as teams etc. Thanks @LinnZawWinn
+      #7 Fixed issue that changing connection kept previous
+      
+      #8 Fixed issue where certain fields in queues were not present in some environments Thanks @AdminDRC
+      
       #6 Fixed issue where you could assign to same user
       #5 altered order/labels of columns
       Cleared roles/queues/teams when "Select User" selected

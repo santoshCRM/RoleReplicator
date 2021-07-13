@@ -126,6 +126,7 @@ namespace RoleReplicatorControl
                                 Domainname = ent.Attributes["domainname"].ToString(),
                                 FullName = ent.Attributes["fullname"].ToString(),
                                 BusinessUnit = ((EntityReference)ent.Attributes["businessunitid"]).Name,
+                                BUId = ((EntityReference)ent.Attributes["businessunitid"]).Id,
                                 SystemUserID = ent.Id
                             }));
 
@@ -170,6 +171,9 @@ namespace RoleReplicatorControl
       <link-entity name='team' from='teamid' to='teamid' link-type='outer' intersect='true'>
         <attribute name='teamid' alias='TeamID'/>
         <attribute name='name' alias='TeamName' />
+        <filter>
+          <condition attribute='isdefault' operator='eq' valueof='systemmanaged' />
+        </filter>
       </link-entity>
     </link-entity>
     <link-entity name='queuemembership' from='systemuserid' to='systemuserid'>
@@ -177,7 +181,6 @@ namespace RoleReplicatorControl
         <attribute name='queuetypecode' />
         <attribute name='queueid' alias='QueueID'/>
         <attribute name='name' alias='QueueName'/>
-        <attribute name='msdyn_queuetype' />
         <filter>
           <condition attribute='queueviewtype' operator='eq' value='1'/>
           <condition attribute='name' operator='not-like' value='&lt;'/>
@@ -208,16 +211,6 @@ namespace RoleReplicatorControl
                 {
                     destUsers.First(usr => usr.SystemUserID == entity.Id).AddAssoc(entity);
                 }
-                //returnUsers.AddRange(
-                //    returnCollection.Entities
-                //        .Select(
-                //            ent => new systemUser
-                //            {
-                //                Domainname = ent.Attributes["domainname"].ToString(),
-                //                FullName = ent.Attributes["fullname"].ToString(),
-                //                BusinessUnit = ((EntityReference)ent.Attributes["businessunitid"]).Name,
-                //                SystemUserID = ent.Id
-                //            }));
 
                 // Check for morerecords, if it returns 1.
                 if (returnCollection.MoreRecords)
@@ -236,7 +229,37 @@ namespace RoleReplicatorControl
 
         }
 
+        internal static string ChangeBUs(List<systemUser> destUsers, Guid businessUnit)
+        {
+            ExecuteMultipleRequest multiReq = new ExecuteMultipleRequest
+            {
+                Settings = new ExecuteMultipleSettings
+                {
+                    ContinueOnError = false,
+                    ReturnResponses = true
+                },
+                Requests = new OrganizationRequestCollection()
+            };
 
+            multiReq.Requests.AddRange(destUsers.Select(user => new SetBusinessSystemUserRequest
+            {
+                BusinessId = businessUnit,
+                UserId = user.SystemUserID,
+                ReassignPrincipal = new EntityReference("systemuser", user.SystemUserID)
+            }));
+
+            if (multiReq.Requests.Any())
+            {
+                ExecuteMultipleResponse response = (ExecuteMultipleResponse)ServiceProxy.Execute(multiReq);
+                if (response.IsFaulted)
+                {
+                    throw new Exception("Error in changing BUs: \n" +
+                        string.Join("\n", response.Responses.Where(resp => resp.Fault != null)
+                        .Select(resp => resp.Fault.ErrorCode + " " + resp.Fault.Message)));
+                }
+            }
+            return string.Empty;
+        }
 
         internal static string CreateXml(string xml, string cookie, int page, int count)
         {
@@ -459,6 +482,12 @@ namespace RoleReplicatorControl
             if (multiReq.Requests.Any())
             {
                 ExecuteMultipleResponse response = (ExecuteMultipleResponse)ServiceProxy.Execute(multiReq);
+                if (response.IsFaulted)
+                {
+                    throw new Exception("Error in Removing Roles: \n" +
+                        string.Join("\n", response.Responses.Where(resp => resp.Fault != null)
+                        .Select(resp => resp.Fault.ErrorCode + " " + resp.Fault.Message)));
+                }
             }
         }
         internal static void adduserRole(List<systemUser> destUsers, List<SecurityRole> roles)
@@ -495,6 +524,12 @@ namespace RoleReplicatorControl
                 if (multiReq.Requests.Any())
                 {
                     ExecuteMultipleResponse response = (ExecuteMultipleResponse)ServiceProxy.Execute(multiReq);
+                    if (response.IsFaulted)
+                    {
+                        throw new Exception("Error in adding Roles: \n" +
+                            string.Join("\n", response.Responses.Where(resp => resp.Fault != null)
+                            .Select(resp => resp.Fault.ErrorCode + " " + resp.Fault.Message)));
+                    }
                 }
             }
             catch (Exception ex)
@@ -539,6 +574,12 @@ namespace RoleReplicatorControl
                 if (multiReq.Requests.Any())
                 {
                     ExecuteMultipleResponse response = (ExecuteMultipleResponse)ServiceProxy.Execute(multiReq);
+                    if (response.IsFaulted)
+                    {
+                        throw new Exception("Error in adding Teams: \n" +
+                            string.Join("\n", response.Responses.Where(resp => resp.Fault != null)
+                            .Select(resp => resp.Fault.ErrorCode + " " + resp.Fault.Message)));
+                    }
                 }
             }
             catch (Exception ex)
@@ -580,6 +621,12 @@ namespace RoleReplicatorControl
             if (multiReq.Requests.Any())
             {
                 ExecuteMultipleResponse response = (ExecuteMultipleResponse)ServiceProxy.Execute(multiReq);
+                if (response.IsFaulted)
+                {
+                    throw new Exception("Error in removing Teams: \n" +
+                        string.Join("\n", response.Responses.Where(resp => resp.Fault != null)
+                        .Select(resp => resp.Fault.ErrorCode + " " + resp.Fault.Message)));
+                }
             }
         }
         internal static void adduserQueue(List<systemUser> destUsers, List<Queue> queues)
@@ -616,6 +663,12 @@ namespace RoleReplicatorControl
                 if (multiReq.Requests.Any())
                 {
                     ExecuteMultipleResponse response = (ExecuteMultipleResponse)ServiceProxy.Execute(multiReq);
+                    if (response.IsFaulted)
+                    {
+                        throw new Exception("Error in adding Queues: \n" +
+                            string.Join("\n", response.Responses.Where(resp => resp.Fault != null)
+                            .Select(resp => resp.Fault.ErrorCode + " " + resp.Fault.Message)));
+                    }
                 }
             }
             catch (Exception ex)
@@ -658,92 +711,13 @@ namespace RoleReplicatorControl
             if (multiReq.Requests.Any())
             {
                 ExecuteMultipleResponse response = (ExecuteMultipleResponse)ServiceProxy.Execute(multiReq);
-            }
-        }
-        internal static void removeuserTeam(Guid[] toUserID, string[] BUs)
-        {
-            for (int x = 0; x < toUserID.Count(); x++)
-            {
-                Guid userid = toUserID[x];
-                List<Team> userTeamss = getTeambyUser(userid, BUs[x]);
-                foreach (Team team in userTeamss)
+                if (response.IsFaulted)
                 {
-                    if (team.TeamId != Guid.Empty)
-                    {
-
-                        _serviceProxy.Execute(new RemoveMembersTeamRequest
-                        {
-                            TeamId = team.TeamId,
-                            MemberIds = toUserID
-                        });
-
-                    }
-
+                    throw new Exception("Error in removing Queues: \n" +
+                        string.Join("\n", response.Responses.Where(resp => resp.Fault != null)
+                        .Select(resp => resp.Fault.ErrorCode + " " + resp.Fault.Message)));
                 }
             }
         }
-        private static void adduserTeam(Guid[] toUserID)
-        {
-            foreach (Team team in Helper.Teams)
-            {
-                if (team.TeamId != Guid.Empty || toUserID[0] != Guid.Empty)
-                {
-
-                    _serviceProxy.Execute(new AddMembersTeamRequest
-                    {
-                        TeamId = team.TeamId,
-                        MemberIds = toUserID
-                    });
-
-                }
-
-            }
-        }
-
-        internal static void removeuserQueue(Guid[] toUserID, string[] BUs)
-        {
-            for (int x = 0; x < toUserID.Count(); x++)
-            {
-                Guid userid = toUserID[x];
-                List<Queue> userQueues = getQueuebyUser(userid, BUs[x]);
-                foreach (Queue queue in userQueues)
-                {
-                    _serviceProxy.Disassociate(
-                  "systemuser",
-                  userid,
-                  new Relationship("queuemembership_association"),
-                  new EntityReferenceCollection { new EntityReference("queue", queue.QueueId) });
-
-                }
-
-
-            }
-        }
-        private static void adduserQueue(Guid[] toUserID)
-        {
-            try
-            {
-                foreach (Queue queue in Helper.Queues)
-                {
-
-                    foreach (Guid userid in toUserID)
-                    {
-                        _serviceProxy.Associate(
-                "systemuser",
-                userid,
-                new Relationship("queuemembership_association"),
-                new EntityReferenceCollection { new EntityReference("queue", queue.QueueId) });
-                    }
-
-                }
-            }
-            catch (Exception ex)
-            {
-
-
-            }
-
-        }
-
     }
 }

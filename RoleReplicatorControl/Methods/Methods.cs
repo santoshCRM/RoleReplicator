@@ -82,6 +82,8 @@ namespace RoleReplicatorControl
                 },
                 ProgressChanged = e => SetWorkingMessage(e.UserState.ToString())
             });
+            grdview_user.DataSource = chkBU.Checked ? DestinationUsers : DestinationUsers.Where(su => su.BusinessUnit == user.BusinessUnit).ToList();
+            lblBU.Text = chkBU.Checked ? "Change BU to " + user.BusinessUnit : "Keep BU";
 
         }
 
@@ -105,7 +107,7 @@ namespace RoleReplicatorControl
                     MessageBoxButtons.OK);
                 return;
             }
-            List<systemUser> destUsers = DestinationUsers.Where(usr => usr.Select && usr.SystemUserID != ((systemUser) drp_users.SelectedItem).SystemUserID).ToList();
+            List<systemUser> destUsers = DestinationUsers.Where(usr => usr.Select && usr.SystemUserID != ((systemUser)drp_users.SelectedItem).SystemUserID).ToList();
             if (!destUsers.Any())
             {
                 MessageBox.Show(
@@ -119,9 +121,9 @@ namespace RoleReplicatorControl
             if (!(chk_role.Checked || chk_queue.Checked || chk_team.Checked))
             {
                 MessageBox.Show(
-    "Please select one or more of the Role, Team or Queue boxes to initiate the copy",
-    "Select Type of Copy",
-    MessageBoxButtons.OK);
+                    "Please select one or more of the Role, Team or Queue boxes to initiate the copy",
+                    "Select Type of Copy",
+                    MessageBoxButtons.OK);
 
                 return;
             }
@@ -132,8 +134,8 @@ namespace RoleReplicatorControl
 
             string caption = "Remove and copy " +
                 (chk_role.Checked && roles.Any() ? "Roles, " : string.Empty) +
-                (chk_team.Checked && teams.Any() ? "Teams, " : string.Empty) +
-                (chk_queue.Checked && queues.Any() ? "Queues, " : string.Empty);
+                (chk_team.Checked ? "Teams, " : string.Empty) +
+                (chk_queue.Checked ? "Queues, " : string.Empty);
             caption = caption.Substring(0, caption.Length - 2) + " for " + Environment.NewLine;
             caption += String.Join(Environment.NewLine, destUsers.Select(usr => usr.FullName));
 
@@ -143,7 +145,7 @@ namespace RoleReplicatorControl
                 return;
             }
 
-
+            Guid buId = ((systemUser)drp_users.SelectedItem).BUId;
 
 
             WorkAsync(new WorkAsyncInfo
@@ -151,10 +153,18 @@ namespace RoleReplicatorControl
                 Message = "Executing request...",
                 Work = (bw, m) =>
                 {
+                    string error = string.Empty;
                     bw.ReportProgress(-1, "Getting destination user details");
                     Helper.getUserDetail(destUsers);
 
-                    if (chk_role.Checked && roles.Any())
+                    if (chkBU.Checked)
+                    {
+                        bw.ReportProgress(-1, "Changing BUs");
+                        string response = Helper.ChangeBUs(destUsers, buId);
+                        if (!string.IsNullOrEmpty(response)) error += "Error in Changing BUs: " + response;
+                    }
+
+                    if (chk_role.Checked && roles.Any() && string.IsNullOrEmpty(error))
                     {
                         bw.ReportProgress(-1, "Removing Roles");
                         Helper.removeuserRole(destUsers);
@@ -164,48 +174,37 @@ namespace RoleReplicatorControl
                         ai.WriteEvent("Roles Copied", roles.Count * destUsers.Count);
                     }
 
-                    if (chk_team.Checked && teams.Any())
+                    if (chk_team.Checked)
                     {
                         bw.ReportProgress(-1, "Removing Teams");
                         Helper.removeuserTeam(destUsers);
-                        bw.ReportProgress(-1, "Adding Teams");
-                        Helper.adduserTeam(destUsers, teams);
-                        ai.WriteEvent("Teams Copied", teams.Count * destUsers.Count);
-
-                        // Helper.adduserRole(destUsers, roles);
+                        if (teams.Any())
+                        {
+                            bw.ReportProgress(-1, "Adding Teams");
+                            Helper.adduserTeam(destUsers, teams);
+                            ai.WriteEvent("Teams Copied", teams.Count * destUsers.Count);
+                        }
                     }
 
                     if (chk_queue.Checked && queues.Any())
                     {
                         bw.ReportProgress(-1, "Removing Queues");
                         Helper.removeuserQueue(destUsers);
-                        bw.ReportProgress(-1, "Adding Queues");
-                        Helper.adduserQueue(destUsers, queues);
-                        ai.WriteEvent("Queues Copied", queues.Count * destUsers.Count);
 
+                        if (queues.Any())
+                        {
+                            bw.ReportProgress(-1, "Adding Queues");
+                            Helper.adduserQueue(destUsers, queues);
+                            ai.WriteEvent("Queues Copied", queues.Count * destUsers.Count);
+                        }
                     }
 
-                    //if (Service != null)
-                    //{
-                    //    Guid[] selecteUsers = new Guid[DestinationUsers.Where(u => u.Select == true).Count()];
-                    //    string[] selecteUserBU = new string[DestinationUsers.Where(u => u.Select == true).Count()];
-                    //    int x = 0;
-                    //    foreach (systemUser row in DestinationUsers.Where(u => u.Select == true))
-                    //    {
-                    //        selecteUsers[x] = row.SystemUserID;
-                    //        selecteUserBU[x] = row.BusinessUnit;
-                    //        x++;
-                    //    }
-                    //    if (selecteUsers.Count() > 0)
-                    //    {
-                    //        Helper.copyRole(selecteUsers, selecteUserBU, chk_role.Checked, chk_team.Checked, chk_queue.Checked);
-                    //    }
-                    //}
                 },
                 PostWorkCallBack = m =>
                 {
                     if (m.Error == null)
                     {
+                        ai.WriteEvent("Users updated", destUsers.Count);
                         MessageBox.Show(
                             "All changes made successfully, please confirm",
                             "Success",
@@ -217,9 +216,33 @@ namespace RoleReplicatorControl
                         MessageBox.Show(this, "An error occured: " + m.Error.Message, "Error", MessageBoxButtons.OK,
                                         MessageBoxIcon.Error);
                     }
+                    GetUsers();
                 },
                 ProgressChanged = e => SetWorkingMessage(e.UserState.ToString())
             });
+
+
+        }
+
+        void DisplayUsers()
+        {
+            var userList = DestinationUsers;
+
+            if (drp_users.SelectedIndex > 0 && !chkBU.Checked)
+            {
+                var selectedUser = ((systemUser)drp_users.SelectedItem);
+                userList = userList.Where(usr => usr.BusinessUnit == selectedUser.BusinessUnit).ToList();
+
+            }
+
+            if (!string.IsNullOrEmpty(txt_filter.Text))
+            {
+                userList = userList.Where(usr => (usr.FullName.ToUpper().Contains(txt_filter.Text.ToUpper())
+                           || usr.Domainname.ToUpper().Contains(txt_filter.Text.ToUpper()))).ToList();
+            }
+
+            grdview_user.DataSource = userList;
+
         }
     }
 }

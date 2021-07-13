@@ -30,6 +30,7 @@
         {
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
             this.lstbox_queues = new System.Windows.Forms.ListBox();
             this.chk_queue = new System.Windows.Forms.CheckBox();
@@ -62,6 +63,8 @@
             this.splitLeftRole = new System.Windows.Forms.SplitContainer();
             this.splitLeftTeams = new System.Windows.Forms.SplitContainer();
             this.splitRight = new System.Windows.Forms.SplitContainer();
+            this.lblBU = new System.Windows.Forms.Label();
+            this.chkBU = new RoleReplicatorControl.RJToggleButton();
             this.groupBox4.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.grdview_user)).BeginInit();
             this.toolStrip1.SuspendLayout();
@@ -171,28 +174,31 @@
             // 
             this.grdview_user.AllowUserToAddRows = false;
             this.grdview_user.AllowUserToDeleteRows = false;
+            dataGridViewCellStyle1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(192)))), ((int)(((byte)(128)))));
+            this.grdview_user.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle1;
             this.grdview_user.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
-            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.grdview_user.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
-            this.grdview_user.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Control;
             dataGridViewCellStyle2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.ControlText;
+            dataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.WindowText;
             dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight;
             dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.grdview_user.DefaultCellStyle = dataGridViewCellStyle2;
+            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.grdview_user.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle2;
+            this.grdview_user.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle3.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle3.ForeColor = System.Drawing.SystemColors.ControlText;
+            dataGridViewCellStyle3.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle3.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.grdview_user.DefaultCellStyle = dataGridViewCellStyle3;
             this.grdview_user.Dock = System.Windows.Forms.DockStyle.Fill;
             this.grdview_user.Location = new System.Drawing.Point(0, 0);
             this.grdview_user.Name = "grdview_user";
             this.grdview_user.ReadOnly = true;
+            this.grdview_user.RowHeadersVisible = false;
             this.grdview_user.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.grdview_user.Size = new System.Drawing.Size(759, 536);
             this.grdview_user.TabIndex = 2;
@@ -499,6 +505,8 @@
             // 
             // splitRight.Panel1
             // 
+            this.splitRight.Panel1.Controls.Add(this.lblBU);
+            this.splitRight.Panel1.Controls.Add(this.chkBU);
             this.splitRight.Panel1.Controls.Add(this.chk_role);
             this.splitRight.Panel1.Controls.Add(this.chk_team);
             this.splitRight.Panel1.Controls.Add(this.chk_queue);
@@ -509,6 +517,30 @@
             this.splitRight.Size = new System.Drawing.Size(765, 619);
             this.splitRight.SplitterDistance = 31;
             this.splitRight.TabIndex = 1;
+            // 
+            // lblBU
+            // 
+            this.lblBU.AutoSize = true;
+            this.lblBU.Location = new System.Drawing.Point(245, 7);
+            this.lblBU.Name = "lblBU";
+            this.lblBU.Size = new System.Drawing.Size(50, 13);
+            this.lblBU.TabIndex = 25;
+            this.lblBU.Text = "Keep BU";
+            // 
+            // chkBU
+            // 
+            this.chkBU.AutoSize = true;
+            this.chkBU.Location = new System.Drawing.Point(193, 4);
+            this.chkBU.MinimumSize = new System.Drawing.Size(45, 22);
+            this.chkBU.Name = "chkBU";
+            this.chkBU.OffBackColor = System.Drawing.Color.Gray;
+            this.chkBU.OffToggleColor = System.Drawing.Color.Gainsboro;
+            this.chkBU.OnBackColor = System.Drawing.Color.DarkOrange;
+            this.chkBU.OnToggleColor = System.Drawing.Color.WhiteSmoke;
+            this.chkBU.Size = new System.Drawing.Size(45, 22);
+            this.chkBU.TabIndex = 24;
+            this.chkBU.UseVisualStyleBackColor = true;
+            this.chkBU.CheckedChanged += new System.EventHandler(this.chkBU_CheckedChanged);
             // 
             // RoleReplicator
             // 
@@ -603,5 +635,7 @@
         private System.Windows.Forms.SplitContainer splitUser;
         private System.Windows.Forms.SplitContainer splitRightDestUsers;
         private System.Windows.Forms.SplitContainer splitRightFilter;
+        private RJToggleButton chkBU;
+        private System.Windows.Forms.Label lblBU;
     }
 }

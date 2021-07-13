@@ -20,8 +20,8 @@ namespace RoleReplicatorControl
         public string BusinessUnit { get; set; }
         [DisplayName("ID")]
         public Guid SystemUserID { get; set; }
-
-
+        [Browsable(false)]
+        public Guid BUId { get; internal set; }
 
         public List<Team> Teams = new List<Team>();
 

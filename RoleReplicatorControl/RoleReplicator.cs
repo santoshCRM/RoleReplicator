@@ -1,4 +1,6 @@
-﻿using System;
+﻿using McTools.Xrm.Connection;
+using Microsoft.Xrm.Sdk;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -40,11 +42,12 @@ namespace RoleReplicatorControl
                 lstbox_queues.DataSource = new List<Queue>();
                 lstbox_Teams.DataSource = new List<Team>();
 
-            
+
                 return;
             }
 
             ExecuteMethod(GetUserDetail);
+            DisplayUsers();
 
         }
 
@@ -55,17 +58,7 @@ namespace RoleReplicatorControl
 
         private void txt_filter_TextChanged(object sender, EventArgs e)
         {
-            if (Service != null)
-            {
-                if (!string.IsNullOrEmpty(txt_filter.Text))
-                {
-                    grdview_user.DataSource = DestinationUsers.Where(x => x.FullName.ToUpper().Contains(txt_filter.Text.ToUpper()) && x.BusinessUnit == ((systemUser)drp_users.SelectedItem).BusinessUnit).ToList();
-                }
-                else
-                {
-                    grdview_user.DataSource = DestinationUsers;
-                }
-            }
+            DisplayUsers();
         }
 
         private void grdview_user_CellMouseClick(object sender, DataGridViewCellMouseEventArgs e)
@@ -98,7 +91,37 @@ namespace RoleReplicatorControl
 
         private void RoleReplicator_Load(object sender, EventArgs e)
         {
+            ////ExecuteMethod(GetUsers);
+        }
+
+        public override void UpdateConnection(IOrganizationService newService, ConnectionDetail detail, string actionName, object parameter)
+        {
+
+            base.UpdateConnection(newService, detail, actionName, parameter);
+
+            LogInfo("Connection has changed to: {0}", detail.WebApplicationUrl);
+
             ExecuteMethod(GetUsers);
         }
+
+        private void chkBU_CheckedChanged(object sender, EventArgs e)
+        {
+            if (chkBU.Checked)
+            {
+                lblBU.Text = "Change BU";
+
+
+                if (drp_users.SelectedIndex > 0)
+                {
+                    lblBU.Text += " to " + ((systemUser)drp_users.SelectedItem).BusinessUnit;
+                }
+            }
+            else
+            {
+                lblBU.Text = "Keep BU";
+            }
+            DisplayUsers();
+        }
+
     }
 }

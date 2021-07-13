@@ -198,6 +198,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controls\ToggleControl.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Methods\Helper.cs" />
     <Compile Include="Classes\Queue.cs" />
     <Compile Include="Classes\SecurityRole.cs" />
